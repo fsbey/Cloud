@@ -108,3 +108,23 @@ resource "aws_route_table_association" "private_subnet_2_association" {
 }
 
 
+# Create a security group
+resource "aws_security_group" "my_security_group" {
+  name_prefix = "my_security_group"
+  vpc_id      = aws_vpc.fsb_vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Launch an EC2 instance in the first private subnet
+resource "aws_instance" "my_instance" {
+  ami           = "ami-0a887e401f7654935"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.private_subnet_1.id
+  vpc_security_group_ids = [aws_security_group.my_security_group.id]
+}
