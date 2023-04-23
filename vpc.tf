@@ -57,12 +57,12 @@ resource "aws_route_table_association" "my_public_route_table_association2" {
 # Create 2 NAT Gateways
 resource "aws_nat_gateway" "nat_gateway_1" {
   allocation_id = aws_eip.nat_gateway_1.id
-  subnet_id     = aws_subnet.private_subnet_1.id
+  subnet_id     = aws_subnet.public_subnet_1.id
 }
 
 resource "aws_nat_gateway" "nat_gateway_2" {
   allocation_id = aws_eip.nat_gateway_2.id
-  subnet_id     = aws_subnet.private_subnet_2.id
+  subnet_id     = aws_subnet.public_subnet_2.id
 }
 
 # EIPs for the NAT Gateways
