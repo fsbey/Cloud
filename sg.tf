@@ -9,5 +9,9 @@ resource "aws_security_group" "CloudSG" {
     protocol    = var.protocol
     cidr_blocks = [var.cidr_blocks]
   }
+
+  tags = {
+    Name = var.env_code
+  }
 }
 

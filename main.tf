@@ -2,6 +2,7 @@ locals {
   public_cidr  = ["173.152.1.0/24", "173.152.2.0/24"]
   private_cidr = ["173.152.3.0/24", "173.152.4.0/24"]
   A_Z          = ["us-east-1a", "us-east-1b"]
+  private_route_table = ["173.152.3.0/24", "173.152.4.0/24"]
 }
 
 provider "aws" {
@@ -12,7 +13,7 @@ resource "aws_vpc" "fsb_vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name = var.env_code
+    Name = "${var.env_code}-fsb_vpc"
   }
 }
 
@@ -20,7 +21,7 @@ resource "aws_internet_gateway" "fsb_igw" {
   vpc_id = aws_vpc.fsb_vpc.id
 
   tags = {
-    Name = var.env_code
+    Name = "${var.env_code}-fsb_igw"
   }
 }
 
@@ -32,7 +33,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "$(var.env_code)-public${count.index}"
+    Name = "$(var.env_code)-public_subnet${count.index}"
   }
 }
 
@@ -44,12 +45,12 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "$(var.env_code)-private${count.index}"
+    Name = "$(var.env_code)-private_subnet${count.index}"
   }
 }
 
 # Create a public route table
-resource "aws_route_table" "my_public_route_table" {
+resource "aws_route_table" "public" {
   vpc_id = aws_vpc.fsb_vpc.id
 
   # Route to the Internet Gateway
@@ -57,61 +58,59 @@ resource "aws_route_table" "my_public_route_table" {
     cidr_block = var.cidr_block
     gateway_id = aws_internet_gateway.fsb_igw.id
   }
-}
 
-# Associate the public subnet with the public route table
-resource "aws_route_table_association" "my_public_route_table_association1" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.my_public_route_table.id
-}
-
-resource "aws_route_table_association" "my_public_route_table_association2" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.my_public_route_table.id
-}
-
-# Create a private route table 1
-resource "aws_route_table" "private_route_table1" {
-  vpc_id = aws_vpc.fsb_vpc.id
-
-  #ROUTE
-  route {
-    cidr_block     = var.cidr_block
-    nat_gateway_id = aws_nat_gateway.nat_gateway_1.id
+  tags = {
+    Name = "${var.env_code}-public_rt"
   }
 }
 
-# Create a private route table 2
-resource "aws_route_table" "private_route_table2" {
+# Associate the public subnets with the public route table
+resource "aws_route_table_association" "my_public_route_table_association" {
+  count = length(public_cidr)
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public.id
+
+  tags = {
+  Name = "$(var.env_code)-public_association${count.index}"
+  }
+}
+
+
+# Create private route tables
+resource "aws_route_table" "private" {
+  count = length(local.private_cidr)
   vpc_id = aws_vpc.fsb_vpc.id
 
   #ROUTE
   route {
     cidr_block     = var.cidr_block
-    nat_gateway_id = aws_nat_gateway.nat_gateway_2.id
+    nat_gateway_id = aws_nat_gateway.nat_gateways.id
+  }
+  tags = {
+  Name = "$(var.env_code)-private_rt${count.index}"
   }
 }
 
 # Associate private subnets with the private rt's
-resource "aws_route_table_association" "private_subnet_1_association" {
+resource "aws_route_table_association" "private_subnet_associations" {
+  count = length(local.private_cidr)
   subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private_route_table1.id
-}
+  route_table_id = aws_route_table.private.id
 
-resource "aws_route_table_association" "private_subnet_2_association" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private_route_table2.id
+  tags = {
+  Name = "$(var.env_code)-private_association${count.index}"
+  }
 }
 
 # Create 2 NAT Gateways & Associate with public subnets 1&2
-resource "aws_nat_gateway" "nat_gateway_1" {
+resource "aws_nat_gateway" "nat_gateways" {
+  count = length(local.public_cidr)
   allocation_id = aws_eip.nat_gateway_1.id
   subnet_id     = aws_subnet.public.id
-}
 
-resource "aws_nat_gateway" "nat_gateway_2" {
-  allocation_id = aws_eip.nat_gateway_2.id
-  subnet_id     = aws_subnet.public.id
+  tags = {
+  Name = "$(var.env_code)-Nat_GW${count.index}"
+  }
 }
 
 # EIPs for the NAT Gateways
