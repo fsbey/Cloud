@@ -6,9 +6,7 @@ variable "vpc_cidr" {
 }
 
 #SUBNETS
-variable "public_subnet1_cidr" {
-}
-variable "public_subnet2_cidr" {
+variable "public_subnet_cidr" {
 }
 variable "private_subnet1_cidr" {
 }
@@ -36,4 +34,8 @@ variable "SGname" {
 variable "ami" {
 }
 variable "instance_type" {
+}
+
+variable "env_code" {
+  type = string
 }
