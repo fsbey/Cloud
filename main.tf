@@ -111,5 +111,6 @@ resource "aws_eip" "nat_gateway" {
 
   tags = {
     Name = "${var.env_code}-NatGW_EIP${count.index}"
+
   }
 }
