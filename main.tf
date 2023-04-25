@@ -65,16 +65,11 @@ resource "aws_route_table" "public" {
 }
 
 # Associate the public subnets with the public route table
-resource "aws_route_table_association" "my_public_route_table_association" {
-  count = length(public_cidr)
-  subnet_id      = aws_subnet.public.id
+resource "aws_route_table_association" "public" {
+  count = length(local.public_cidr)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
-
-  tags = {
-  Name = "$(var.env_code)-public_association${count.index}"
-  }
 }
-
 
 # Create private route tables
 resource "aws_route_table" "private" {
@@ -87,15 +82,15 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.nat_gateways.id
   }
   tags = {
-  Name = "$(var.env_code)-private_rt${count.index}"
+  Name = "private${count.index}"
   }
 }
 
 # Associate private subnets with the private rt's
 resource "aws_route_table_association" "private_subnet_associations" {
   count = length(local.private_cidr)
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
 
   tags = {
   Name = "$(var.env_code)-private_association${count.index}"
@@ -105,8 +100,8 @@ resource "aws_route_table_association" "private_subnet_associations" {
 # Create 2 NAT Gateways & Associate with public subnets 1&2
 resource "aws_nat_gateway" "nat_gateways" {
   count = length(local.public_cidr)
-  allocation_id = aws_eip.nat_gateway_1.id
-  subnet_id     = aws_subnet.public.id
+  allocation_id = aws_eip.nat_gateway.id
+  subnet_id     = aws_subnet.public[count.index].id
 
   tags = {
   Name = "$(var.env_code)-Nat_GW${count.index}"
@@ -114,10 +109,11 @@ resource "aws_nat_gateway" "nat_gateways" {
 }
 
 # EIPs for the NAT Gateways
-resource "aws_eip" "nat_gateway_1" {
+resource "aws_eip" "nat_gateway" {
+  count = length(local.public_cidr)
   vpc = true
-}
 
-resource "aws_eip" "nat_gateway_2" {
-  vpc = true
+  tags = {
+  Name = "$(var.env_code)-Nat_GW_EIP${count.index}"
+  }
 }
