@@ -33,7 +33,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "$(var.env_code)-public_subnet${count.index}"
+    Name = "${var.env_code}-public_subnet${count.index}"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "$(var.env_code)-private_subnet${count.index}"
+    Name = "${var.env_code}-private_subnet${count.index}"
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "${var.env_code}-public_rt"
+    Name = var.env_code
   }
 }
 
@@ -82,7 +82,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.nat_gateways[count.index].id
   }
   tags = {
-    Name = "private${count.index}"
+    Name = "${var.env_code}-privateRT${count.index}"
   }
 }
 
@@ -91,10 +91,6 @@ resource "aws_route_table_association" "private_subnet_associations" {
   count          = length(local.private_cidr)
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
-
-  tags = {
-    Name = "$(var.env_code)-private_association${count.index}"
-  }
 }
 
 # Create 2 NAT Gateways & Associate with public subnets 1&2
@@ -104,7 +100,7 @@ resource "aws_nat_gateway" "nat_gateways" {
   subnet_id     = aws_subnet.public[count.index].id
 
   tags = {
-    Name = "$(var.env_code)-Nat_GW${count.index}"
+    Name = "${var.env_code}-Nat_GW${count.index}"
   }
 }
 
@@ -114,6 +110,6 @@ resource "aws_eip" "nat_gateway" {
   vpc   = true
 
   tags = {
-    Name = "$(var.env_code)-Nat_GW_EIP${count.index}"
+    Name = "${var.env_code}-NatGW_EIP${count.index}"
   }
 }
