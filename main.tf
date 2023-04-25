@@ -79,7 +79,7 @@ resource "aws_route_table" "private" {
   #ROUTE
   route {
     cidr_block     = var.cidr_block
-    nat_gateway_id = aws_nat_gateway.nat_gateways.id
+    nat_gateway_id = aws_nat_gateway.nat_gateways[count.index].id
   }
   tags = {
   Name = "private${count.index}"
@@ -100,7 +100,7 @@ resource "aws_route_table_association" "private_subnet_associations" {
 # Create 2 NAT Gateways & Associate with public subnets 1&2
 resource "aws_nat_gateway" "nat_gateways" {
   count = length(local.public_cidr)
-  allocation_id = aws_eip.nat_gateway.id
+  allocation_id = aws_eip.nat_gateway[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
 
   tags = {
