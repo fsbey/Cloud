@@ -1,7 +1,7 @@
 locals {
-  public_cidr = ["173.152.1.0/24", "173.152.2.0/24"]
+  public_cidr  = ["173.152.1.0/24", "173.152.2.0/24"]
   private_cidr = ["173.152.3.0/24", "173.152.4.0/24"]
-  A_Z = ["us-east-1a", "us-east-1b"]
+  A_Z          = ["us-east-1a", "us-east-1b"]
 }
 
 provider "aws" {
@@ -12,7 +12,7 @@ resource "aws_vpc" "fsb_vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
-  Name = var.env_code
+    Name = var.env_code
   }
 }
 
@@ -20,31 +20,31 @@ resource "aws_internet_gateway" "fsb_igw" {
   vpc_id = aws_vpc.fsb_vpc.id
 
   tags = {
-  Name = var.env_code
+    Name = var.env_code
   }
 }
 
 resource "aws_subnet" "public" {
-    count = length(local.public_cidr)
+  count                   = length(local.public_cidr)
   vpc_id                  = aws_vpc.fsb_vpc.id
   cidr_block              = local.public_cidr[count.index]
   availability_zone       = local.A_Z[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-  Name = "$(var.env_code)-public${count.index}"
+    Name = "$(var.env_code)-public${count.index}"
   }
 }
 
 resource "aws_subnet" "private" {
-    count = length(local.private_cidr)
+  count                   = length(local.private_cidr)
   vpc_id                  = aws_vpc.fsb_vpc.id
   cidr_block              = local.private_cidr[count.index]
   availability_zone       = local.A_Z[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-  Name = "$(var.env_code)-private${count.index}"
+    Name = "$(var.env_code)-private${count.index}"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_route_table_association" "my_public_route_table_association2" {
 resource "aws_route_table" "private_route_table1" {
   vpc_id = aws_vpc.fsb_vpc.id
 
-#ROUTE
+  #ROUTE
   route {
     cidr_block     = var.cidr_block
     nat_gateway_id = aws_nat_gateway.nat_gateway_1.id
