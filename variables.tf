@@ -1,0 +1,39 @@
+#variable 
+variable "region" {
+}
+
+variable "vpc_cidr" {
+}
+
+#SUBNETS
+variable "public_subnet1_cidr" {
+}
+variable "public_subnet2_cidr" {
+}
+variable "private_subnet1_cidr" {
+}
+variable "private_subnet2_cidr" {
+}
+variable "AZ-1a" {
+}
+variable "AZ-1b" {
+}
+
+variable "cidr_block" {
+}
+
+#SEC-GROUP-DETAILS
+variable "cidr_blocks" {
+}
+variable "protocol" {
+}
+variable "port" {
+}
+variable "SGname" {
+}
+
+#INSTANCE DETAILS
+variable "ami" {
+}
+variable "instance_type" {
+}
