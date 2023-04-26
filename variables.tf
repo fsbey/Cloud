@@ -29,6 +29,10 @@ variable "port" {
 }
 variable "SGname" {
 }
+variable "port2" {
+}
+variable "SGname2" {
+}
 
 #INSTANCE DETAILS
 variable "ami" {
