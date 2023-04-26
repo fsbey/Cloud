@@ -2,9 +2,35 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "kernel-id"
+    values = ["*5.10*"]
+  }
+
+  owners = ["amazon"]
+}
+
 # Launch an EC2 instance with a sec group and key_name parameter
 resource "aws_instance" "fsb_instance" {
-  ami                    = var.ami
+  ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = var.instance_type
   key_name               = "MyKeyPair"
   subnet_id              = aws_subnet.public[0].id
