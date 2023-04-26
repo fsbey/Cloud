@@ -21,11 +21,15 @@ data "aws_ami" "amazon_linux_2" {
   }
 
   filter {
-    name   = "kernel-id"
-    values = ["*5.10*"]
+    name   = "block-device-mapping.volume-type"
+    values = ["gp2"]
   }
 
-  owners = ["amazon"]
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
+
 }
 
 # Launch an EC2 instance with a sec group and key_name parameter
