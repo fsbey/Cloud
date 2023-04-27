@@ -43,3 +43,7 @@ variable "instance_type" {
 variable "env_code" {
   type = string
 }
+variable "vpcc" {
+}
+variable "subnetvpcc" {
+}
