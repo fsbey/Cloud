@@ -36,9 +36,19 @@ data "aws_ami" "amazon_linux_2" {
 resource "aws_instance" "fsb_instance" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = var.instance_type
-  key_name               = "MyKeyPair"
-  subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.FSB_SG.id]
+  key_name               = "OG"
+  subnet_id              = "subnet-0332aa50e8a8681cb"
+  vpc_security_group_ids = [aws_security_group.My_sg.id]
+  iam_instance_profile   = "ec2_role_ssm"
+
+  user_data = <<-EOF
+    #!/bin/bash
+    yum update -y
+    yum install -y amazon-ssm-agent
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    EOF
 
 
   tags = {
@@ -47,9 +57,9 @@ resource "aws_instance" "fsb_instance" {
 }
 
 #CREATE SG
-resource "aws_security_group" "FSB_SG" {
+resource "aws_security_group" "My_sg" {
   name_prefix = var.SGname2
-  vpc_id      = aws_vpc.fsb_vpc.id
+  vpc_id      = "vpc-0ca70b4fc5a1ecdca"
 
   ingress {
     from_port   = var.port
@@ -65,7 +75,28 @@ resource "aws_security_group" "FSB_SG" {
     cidr_blocks = [var.cidr_block]
   }
 
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.cidr_block]
+  }
+
   tags = {
-    Name = "${var.env_code}-fsb-security-group"
+    Name = "${var.env_code}-my_SG"
   }
 }
