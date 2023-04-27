@@ -37,7 +37,7 @@ resource "aws_instance" "fsb_instance" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = var.instance_type
   key_name               = "OG"
-  subnet_id              = var.subnetvpcc
+  subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.My_sg.id]
   iam_instance_profile   = "ec2_role_ssm"
 
@@ -59,7 +59,7 @@ resource "aws_instance" "fsb_instance" {
 #CREATE SG
 resource "aws_security_group" "My_sg" {
   name_prefix = var.SGname2
-  vpc_id      = var.vpcc
+  vpc_id      = aws_vpc.fsb_vpc.id
 
   ingress {
     from_port   = var.port
