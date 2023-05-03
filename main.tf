@@ -5,6 +5,15 @@ locals {
   private_route_table = ["173.152.3.0/24", "173.152.4.0/24"]
 }
 
+terraform {
+  backend "s3" {
+    bucket         = "tfremotestatefsb"
+    key            = "fsb.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "fsb_dynamo_db"
+  }
+}
+
 resource "aws_vpc" "fsb_vpc" {
   cidr_block = var.vpc_cidr
 
