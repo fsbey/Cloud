@@ -27,3 +27,19 @@ data "aws_ami" "amazon_linux_2" {
   }
 
 }
+
+data "aws_s3_bucket" "example_bucket" {
+  bucket = "tfremotestatefsb"
+}
+
+output "bucket_name" {
+  value = data.aws_s3_bucket.example_bucket.id
+}
+
+data "aws_dynamodb_table" "example_table" {
+  name = "fsb_dynamo_dbtable"
+}
+
+output "table_name" {
+  value = data.aws_dynamodb_table.example_table.name
+}
