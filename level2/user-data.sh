@@ -14,3 +14,4 @@ user_data = <<-EOF
     rm -rf 2048
     systemctl restart httpd
     EOF
+    

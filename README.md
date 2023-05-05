@@ -1,2 +1,1 @@
-Automating AWS with Terraform
-We are using git branches to track changes
+This is a task to change the layout of the terraform repository
