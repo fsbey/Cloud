@@ -11,13 +11,13 @@ resource "aws_dynamodb_table" "lock_table" {
 resource "aws_s3_bucket" "fsb_bucket" {
   bucket = "tfremotestatefsb"
   tags = {
-    Name        = "tfremotestatefsb"
+    Name = "tfremotestatefsb"
   }
 }
 
-resource "aws_s3_bucket_acl" "fsb_bucket" {
-  bucket = aws_s3_bucket.fsb_bucket.id
+# resource "aws_s3_bucket_acl" "fsb_bucket" {
+#   bucket = aws_s3_bucket.fsb_bucket.id
 
-  acl = "public-read-write"
-}
+#   acl = "public-read-write"
+# }
 
