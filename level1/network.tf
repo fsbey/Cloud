@@ -1,17 +1,8 @@
 locals {
-  public_cidr         = ["173.152.1.0/24", "173.152.2.0/24"]
-  private_cidr        = ["173.152.3.0/24", "173.152.4.0/24"]
+  public_cidr         = ["168.150.1.0/24", "168.150.2.0/24"]
+  private_cidr        = ["168.150.3.0/24", "168.150.4.0/24"]
   A_Z                 = ["us-east-1a", "us-east-1b"]
-  private_route_table = ["173.152.3.0/24", "173.152.4.0/24"]
-}
-
-terraform {
-  backend "s3" {
-    bucket         = "tfremotestatefsb"
-    key            = "fsb.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "fsb_dynamo_db"
-  }
+  private_route_table = ["168.150.3.0/24", "168.150.4.0/24"]
 }
 
 resource "aws_vpc" "fsb_vpc" {
@@ -42,6 +33,30 @@ resource "aws_subnet" "public" {
   }
 }
 
+
+#Public route table associated with the public subnets
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.fsb_vpc.id
+
+  #ROUTE 
+  route {
+    cidr_block = var.cidr_block
+    gateway_id = aws_internet_gateway.fsb_igw.id
+  }
+  tags = {
+    Name = "${var.env_code}-publicRT"
+  }
+}
+
+# Associate the public subnets with the public route table
+resource "aws_route_table_association" "public" {
+  count          = length(local.public_cidr)
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+
+
 resource "aws_subnet" "private" {
   count                   = length(local.private_cidr)
   vpc_id                  = aws_vpc.fsb_vpc.id
@@ -54,34 +69,12 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Create a public route table
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.fsb_vpc.id
-
-  # Route to the Internet Gateway
-  route {
-    cidr_block = var.cidr_block
-    gateway_id = aws_internet_gateway.fsb_igw.id
-  }
-
-  tags = {
-    Name = var.env_code
-  }
-}
-
-# Associate the public subnets with the public route table
-resource "aws_route_table_association" "public" {
-  count          = length(local.public_cidr)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-# Create private route tables
+#Private route tables 
 resource "aws_route_table" "private" {
   count  = length(local.private_cidr)
   vpc_id = aws_vpc.fsb_vpc.id
 
-  #ROUTE
+  #ROUTE 
   route {
     cidr_block     = var.cidr_block
     nat_gateway_id = aws_nat_gateway.nat_gateways[count.index].id
@@ -91,12 +84,13 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Associate private subnets with the private rt's
-resource "aws_route_table_association" "private_subnet_associations" {
+# Associate the private subnets with the private route tables
+resource "aws_route_table_association" "private" {
   count          = length(local.private_cidr)
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 }
+
 
 # Create 2 NAT Gateways & Associate with public subnets 1&2
 resource "aws_nat_gateway" "nat_gateways" {
@@ -116,6 +110,5 @@ resource "aws_eip" "nat_gateway" {
 
   tags = {
     Name = "${var.env_code}-NatGW_EIP${count.index}"
-
   }
 }

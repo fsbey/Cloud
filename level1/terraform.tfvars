@@ -1,0 +1,7 @@
+env_code   = "Mentorship"
+cidr_block = "0.0.0.0/0"
+vpc_cidr   = "168.150.0.0/16"
+SGname     = "CloudSg"
+port       = "22"
+port2      = "80"
+protocol   = "tcp"
