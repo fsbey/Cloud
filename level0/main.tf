@@ -14,10 +14,3 @@ resource "aws_s3_bucket" "fsb_bucket" {
     Name = "tfremotestatefsb"
   }
 }
-
-# resource "aws_s3_bucket_acl" "fsb_bucket" {
-#   bucket = aws_s3_bucket.fsb_bucket.id
-
-#   acl = "public-read-write"
-# }
-
