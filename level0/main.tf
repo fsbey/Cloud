@@ -8,11 +8,16 @@ resource "aws_dynamodb_table" "lock_table" {
   }
 }
 
-resource "aws_s3_bucket" "example" {
+resource "aws_s3_bucket" "fsb_bucket" {
   bucket = "tfremotestatefsb"
-  acl    = "public"
-
   tags = {
     Name        = "tfremotestatefsb"
   }
 }
+
+resource "aws_s3_bucket_acl" "fsb_bucket" {
+  bucket = aws_s3_bucket.fsb_bucket.id
+
+  acl = "public-read-write"
+}
+
