@@ -27,9 +27,9 @@ resource "aws_lb" "alb" {
   name               = "my-alb1"
   internal           = false
   load_balancer_type = "application"
-  subnets = data.terraform_remote_state.level1.outputs.public_subnet_id
+  subnets            = data.terraform_remote_state.level1.outputs.public_subnet_id
 
-  security_groups    = [aws_security_group.alb_sg.id]
+  security_groups = [aws_security_group.alb_sg.id]
 }
 
 # Create listener for ALB
@@ -42,5 +42,5 @@ resource "aws_lb_listener" "alb_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.TG.arn
-    }
+  }
 }

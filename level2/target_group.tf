@@ -19,7 +19,7 @@ resource "aws_lb_target_group" "TG" {
 
 #TG Association1
 resource "aws_lb_target_group_attachment" "instances_attachment" {
-  count = length(local.private_cidr)
+  count            = length(local.private_cidr)
   target_group_arn = aws_lb_target_group.TG.arn
   target_id        = aws_instance.fsb_server[count.index].id
   port             = 80
