@@ -27,14 +27,7 @@ resource "aws_lb" "alb" {
   name               = "my-alb1"
   internal           = false
   load_balancer_type = "application"
-  
-  subnet_mapping {
-    subnet_id = data.terraform_remote_state.level1.outputs.public_subnet_id[0]
-  }
-
-  subnet_mapping {
-    subnet_id = data.terraform_remote_state.level1.outputs.public_subnet_id[1]
-  }
+  subnets = data.terraform_remote_state.level1.outputs.public_subnet_id
 
   security_groups    = [aws_security_group.alb_sg.id]
 }
