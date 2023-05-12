@@ -17,10 +17,18 @@ resource "aws_lb_target_group" "TG" {
   }
 }
 
-#TG Association1
-resource "aws_lb_target_group_attachment" "instances_attachment" {
-  count            = length(local.private_cidr)
+# TG Association1
+resource "aws_lb_target_group_attachment" "asg_attachment" {
   target_group_arn = aws_lb_target_group.TG.arn
-  target_id        = aws_instance.fsb_server[count.index].id
+  target_type      = "instance"
   port             = 80
+
+  depends_on = [aws_autoscaling_group.fsb_asg]
+
+  dynamic "target" {
+    for_each = aws_autoscaling_group.fsb_asg.names
+    content {
+      id = target.value
+    }
+  }
 }
