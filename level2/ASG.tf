@@ -35,8 +35,8 @@ resource "aws_autoscaling_group" "fsb_asg" {
     id      = aws_launch_template.fsb_launch_template.id
     version = "$Latest"
   }
-  vpc_zone_identifier       = [data.terraform_remote_state.level1.outputs.private_subnet_id]
-  target_group_arns         = [aws_lb_target_group.TG.arn]
+  vpc_zone_identifier = [data.terraform_remote_state.level1.outputs.private_subnet_id]
+  target_group_arns   = [aws_lb_target_group.TG.arn]
   tags = [
     {
       key                 = "Name"
