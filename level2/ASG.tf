@@ -6,6 +6,10 @@ resource "aws_launch_template" "fsb_launch_template" {
 
   # Other launch template configurations...
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.fsb_instance_profile.name
+  }
+
   user_data = base64encode(<<-EOF
     #!/bin/bash
     yum update -y
@@ -36,6 +40,7 @@ resource "aws_autoscaling_group" "fsb_asg" {
     version = "$Latest"
   }
   vpc_zone_identifier = data.terraform_remote_state.level1.outputs.private_subnet_id
+  # Attach IAM role to ASG instances
   target_group_arns   = [aws_lb_target_group.TG.arn]
   tag {
     key                 = "Name"
