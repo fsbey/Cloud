@@ -40,19 +40,11 @@ resource "aws_security_group" "My_sg" {
   vpc_id      = data.terraform_remote_state.level1.outputs.vpc_id
 
   ingress {
-    from_port   = var.port
-    to_port     = var.port
-    protocol    = var.protocol
-    cidr_blocks = [data.terraform_remote_state.level1.outputs.cidr_block]
-  }
-
-  ingress {
     from_port   = var.port2
     to_port     = var.port2
     protocol    = var.protocol
     cidr_blocks = [data.terraform_remote_state.level1.outputs.cidr_block]
   }
-
 
   ingress {
     from_port   = 0
@@ -86,4 +78,3 @@ resource "aws_security_group" "My_sg" {
     Name = "${var.env_code}-my_public_SG"
   }
 }
-
