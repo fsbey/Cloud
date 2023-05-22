@@ -34,9 +34,9 @@ data "aws_ec2_instance_type" "t2_micro" {
 }
 
 resource "aws_launch_template" "fsb_launch_template" {
-  name_prefix   = "fsbLT"
-  image_id      = data.aws_ami.amazon_linux_2.id
-  instance_type = data.aws_ec2_instance_type.t2_micro.id
+  name_prefix            = "fsbLT"
+  image_id               = data.aws_ami.amazon_linux_2.id
+  instance_type          = data.aws_ec2_instance_type.t2_micro.id
   vpc_security_group_ids = [aws_security_group.My_sg.id]
 
   # Other launch template configurations...
@@ -66,17 +66,17 @@ resource "aws_launch_template" "fsb_launch_template" {
 
 # Create ASG
 resource "aws_autoscaling_group" "fsb_asg" {
-  name                      = "fsb-asg"
-  max_size                  = 3
-  min_size                  = 1
-  desired_capacity          = 1
+  name             = "fsb-asg"
+  max_size         = 3
+  min_size         = 1
+  desired_capacity = 1
   launch_template {
     id      = aws_launch_template.fsb_launch_template.id
     version = "$Latest"
   }
   vpc_zone_identifier = var.private_subnet_id
   # Attach IAM role to ASG instances
-  target_group_arns   = [var.target_group_arn]
+  target_group_arns = [var.target_group_arn]
   tag {
     key                 = "Name"
     value               = "${var.env_code}-fsb_asg"

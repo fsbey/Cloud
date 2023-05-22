@@ -3,7 +3,7 @@
 # Log in to one of your instances, download install AWS CLI, and make sure that you can run aws s3 commands from inside this instance
 
 resource "aws_iam_role" "s3_full_access_role" {
-  name = "S3FullAccessRole"
+  name               = "S3FullAccessRole"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

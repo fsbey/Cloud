@@ -4,5 +4,5 @@ output "load_balancer_sg" {
 }
 
 output "target_group_arn" {
-    value =  aws_lb_target_group.TG.arn
+  value = aws_lb_target_group.TG.arn
 }
