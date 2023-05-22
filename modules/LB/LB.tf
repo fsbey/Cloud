@@ -34,11 +34,11 @@ resource "aws_lb" "alb" {
 # Create listener for ALB
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
 
   default_action {
-    type         = "forward"
+    type               = "forward"
     target_group_arn   = aws_lb_target_group.TG.arn
   }
 }
@@ -60,4 +60,12 @@ resource "aws_lb_target_group" "TG" {
     matcher             = 200
   }
 
+}
+
+resource "aws_route53_record" "my_dns_record" {
+  zone_id = "Z05599622K22XV64ERVX6"
+  name    = "mentorship"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["my-alb1-713027817.us-east-1.elb.amazonaws.com"]
 }
