@@ -2,6 +2,14 @@ locals {
   public_cidr = ["168.150.1.0/24", "168.150.2.0/24"]
 }
 
+data "aws_route53_zone" "hosted_zone" {
+  name = "itsguts.com"  # Replace with your domain name
+}
+
+data "aws_lb" "my_alb" {
+  name = "my-alb1-1103128705"
+}
+
 # Create security group for ALB
 resource "aws_security_group" "alb_sg" {
   name_prefix = "alb-sg"
@@ -36,6 +44,8 @@ resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 443
   protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"  # Specify the appropriate SSL policy for your application
+  certificate_arn   = aws_lb_listener_certificate.lb_cert.certificate_arn
 
   default_action {
     type               = "forward"
@@ -63,9 +73,9 @@ resource "aws_lb_target_group" "TG" {
 }
 
 resource "aws_route53_record" "my_dns_record" {
-  zone_id = "Z05599622K22XV64ERVX6"
-  name    = "mentorship"
+  zone_id = data.aws_route53_zone.hosted_zone.id
+  name    = "mentorship.itsguts.com"
   type    = "CNAME"
   ttl     = 300
-  records = ["my-alb1-713027817.us-east-1.elb.amazonaws.com"]
+  records = [data.aws_lb.my_alb.id]
 }
