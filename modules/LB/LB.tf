@@ -6,10 +6,6 @@ data "aws_route53_zone" "hosted_zone" {
   name = "itsguts.com"  # Replace with your domain name
 }
 
-data "aws_lb" "my_alb" {
-  name = "my-alb1-1103128705"
-}
-
 # Create security group for ALB
 resource "aws_security_group" "alb_sg" {
   name_prefix = "alb-sg"
@@ -73,9 +69,9 @@ resource "aws_lb_target_group" "TG" {
 }
 
 resource "aws_route53_record" "my_dns_record" {
-  zone_id = data.aws_route53_zone.hosted_zone.id
-  name    = "mentorship.itsguts.com"
+  zone_id = data.aws_route53_zone.hosted_zone.zone_id
+  name    = "www.${data.aws_route53_zone.hosted_zone.name}"
   type    = "CNAME"
   ttl     = 300
-  records = [data.aws_lb.my_alb.id]
+  records = [aws_lb.my_alb.dns_name]
 }
