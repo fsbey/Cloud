@@ -38,10 +38,8 @@ resource "aws_lb" "alb" {
 # Create listener for ALB
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"  # Specify the appropriate SSL policy for your application
-  certificate_arn   = aws_lb_listener_certificate.lb_cert.certificate_arn
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
     type               = "forward"
@@ -73,5 +71,5 @@ resource "aws_route53_record" "my_dns_record" {
   name    = "www.${data.aws_route53_zone.hosted_zone.name}"
   type    = "CNAME"
   ttl     = 300
-  records = [aws_lb.my_alb.dns_name]
+  records = [aws_lb.alb.dns_name]
 }
