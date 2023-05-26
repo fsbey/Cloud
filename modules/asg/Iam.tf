@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
 
 
 resource "aws_iam_instance_profile" "fsb_instance_profile" {
-  name = "FsbInstanceProfile"
+  name = "FsbInstanceProfilee"
 
   role = aws_iam_role.s3_full_access_role.name
 }

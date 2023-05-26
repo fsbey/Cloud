@@ -12,8 +12,8 @@ resource "aws_security_group" "alb_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -38,19 +38,23 @@ resource "aws_lb" "alb" {
 # Create listener for ALB
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = aws_acm_certificate.main.arn
 
   default_action {
-    type               = "forward"
-    target_group_arn   = aws_lb_target_group.TG.arn
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TG.arn
   }
 }
+
 
 #TG Creation1
 resource "aws_lb_target_group" "TG" {
   name_prefix = "FsbTG"
-  port        = 80
+  port        = 443
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
 
